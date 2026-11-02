@@ -1,13 +1,17 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { SpatialViewport } from './components/SpatialViewport';
+import { CameraFeed } from './components/CameraFeed';
 import { CocktailHUD } from './components/CocktailHUD';
 import { HazardAlertBanner } from './components/HazardAlertBanner';
+import { SettingsModal } from './components/SettingsModal';
 import { useMozaTelemetry } from './hooks/useMozaTelemetry';
-import { Eye, Users, Activity, Settings, Radio } from 'lucide-react';
+import { Eye, Users, Settings, Radio, Box, Video } from 'lucide-react';
 import './styles/theme.css';
 
 export const App: React.FC = () => {
   const { telemetry, isConnected } = useMozaTelemetry();
+  const [activeView, setActiveView] = useState<'spatial' | 'camera'>('spatial');
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', height: '100vh', width: '100vw', background: 'var(--bg-dark)' }}>
@@ -35,16 +39,69 @@ export const App: React.FC = () => {
           </div>
         </div>
 
+        {/* View Mode Switcher */}
+        <div
+          style={{
+            display: 'flex',
+            background: 'rgba(255, 255, 255, 0.04)',
+            padding: '3px',
+            borderRadius: '8px',
+            border: '1px solid var(--border)',
+          }}
+        >
+          <button
+            onClick={() => setActiveView('spatial')}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '6px',
+              padding: '6px 14px',
+              borderRadius: '6px',
+              border: 'none',
+              background: activeView === 'spatial' ? 'rgba(0, 242, 254, 0.15)' : 'transparent',
+              color: activeView === 'spatial' ? 'var(--neon-cyan)' : 'var(--text-muted)',
+              fontWeight: activeView === 'spatial' ? 600 : 400,
+              fontSize: '12px',
+              cursor: 'pointer',
+              transition: 'all 0.2s ease',
+            }}
+          >
+            <Box size={14} />
+            <span>3D Spatial Grid</span>
+          </button>
+          <button
+            onClick={() => setActiveView('camera')}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '6px',
+              padding: '6px 14px',
+              borderRadius: '6px',
+              border: 'none',
+              background: activeView === 'camera' ? 'rgba(0, 242, 254, 0.15)' : 'transparent',
+              color: activeView === 'camera' ? 'var(--neon-cyan)' : 'var(--text-muted)',
+              fontWeight: activeView === 'camera' ? 600 : 400,
+              fontSize: '12px',
+              cursor: 'pointer',
+              transition: 'all 0.2s ease',
+            }}
+          >
+            <Video size={14} />
+            <span>Live Camera Feed</span>
+          </button>
+        </div>
+
         {/* Status Indicators */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '18px' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '13px', fontFamily: 'var(--font-mono)' }}>
             <Radio size={16} color={isConnected ? 'var(--neon-green)' : 'var(--neon-red)'} />
             <span style={{ color: isConnected ? 'var(--neon-green)' : 'var(--neon-red)' }}>
-              {isConnected ? 'PYTHON ENGINE ONLINE' : 'DISCONNECTED'}
+              {isConnected ? 'LOCAL ENGINE ONLINE' : 'DISCONNECTED'}
             </span>
           </div>
 
           <button
+            onClick={() => setIsSettingsOpen(true)}
             className="glass-panel"
             style={{
               padding: '6px 12px',
@@ -64,9 +121,13 @@ export const App: React.FC = () => {
 
       {/* Main Workspace (Split View) */}
       <div style={{ display: 'flex', flex: 1, overflow: 'hidden' }}>
-        {/* Left: 3D Spatial Viewport */}
+        {/* Left: Viewport (3D or Live Video) */}
         <div style={{ flex: '1 1 65%', position: 'relative' }}>
-          <SpatialViewport telemetry={telemetry} />
+          {activeView === 'spatial' ? (
+            <SpatialViewport telemetry={telemetry} />
+          ) : (
+            <CameraFeed isConnected={isConnected} />
+          )}
         </div>
 
         {/* Right: Telemetry & Alert Sidebar */}
@@ -113,6 +174,10 @@ export const App: React.FC = () => {
           {/* System Telemetry & Bobby CAD Homography Info */}
           <div className="glass-panel" style={{ padding: '16px', fontSize: '12px', color: 'var(--text-muted)', display: 'flex', flexDirection: 'column', gap: '8px' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+              <span>Deployment Mode</span>
+              <span style={{ color: 'var(--neon-green)', fontWeight: 600 }}>100% Local (127.0.0.1)</span>
+            </div>
+            <div style={{ display: 'flex', justifyContent: 'space-between' }}>
               <span>Inference Pipeline</span>
               <span style={{ color: '#fff' }}>YOLOv11 + TransLab Glass</span>
             </div>
@@ -131,6 +196,9 @@ export const App: React.FC = () => {
           </div>
         </div>
       </div>
+
+      {/* Settings Modal */}
+      <SettingsModal isOpen={isSettingsOpen} onClose={() => setIsSettingsOpen(false)} />
     </div>
   );
 };

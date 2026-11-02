@@ -7,16 +7,20 @@ import asyncio
 import json
 import threading
 import time
-from typing import Dict, Any, List
+from typing import Dict, Any, List, Optional, Union
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect
+from fastapi.responses import StreamingResponse
 from fastapi.middleware.cors import CORSMiddleware
+from pydantic import BaseModel
 import uvicorn
+import cv2
 
 from moza.capture.camera import CameraManager
 from moza.detectors.detector import PersonDetector
 from moza.detectors.shatter import ShatterDetector
 from moza.analytics.engine import AnalyticsEngine
 from moza.rules.decision_engine import DecisionEngine
+from moza.privacy.anonymizer import FaceAnonymizer
 from moza.logger import logger
 
 app = FastAPI(
@@ -77,16 +81,29 @@ latest_telemetry: Dict[str, Any] = {
     "trend": "stable",
     "timestamp": time.time()
 }
+latest_jpeg_frame: Optional[bytes] = None
+active_config: Dict[str, Any] = {
+    "confidence": 0.35,
+    "anonymize_faces": True,
+    "source": 0
+}
 
 
-def background_vision_worker(camera_source: int = 0, confidence: float = 0.35):
+class ConfigPayload(BaseModel):
+    confidence: Optional[float] = None
+    anonymize_faces: Optional[bool] = None
+    source: Optional[Union[int, str]] = None
+
+
+def background_vision_worker():
     """Continuous edge detection loop running in background thread."""
-    global latest_telemetry
+    global latest_telemetry, latest_jpeg_frame
 
     try:
-        camera = CameraManager(source=camera_source, resolution=(1280, 720))
-        detector = PersonDetector(confidence_threshold=confidence, use_yolo=True, detect_objects=True)
+        camera = CameraManager(source=active_config["source"], resolution=(1280, 720))
+        detector = PersonDetector(confidence_threshold=active_config["confidence"], use_yolo=True, detect_objects=True)
         shatter_detector = ShatterDetector()
+        anonymizer = FaceAnonymizer()
         analytics = AnalyticsEngine(db_path="data/metrics.db")
         decision_engine = DecisionEngine()
 
@@ -101,11 +118,27 @@ def background_vision_worker(camera_source: int = 0, confidence: float = 0.35):
                 time.sleep(0.01)
                 continue
 
+            # Update detector threshold dynamically if config changed
+            if detector.confidence_threshold != active_config["confidence"]:
+                detector.confidence_threshold = active_config["confidence"]
+
             detections = detector.detect(frame)
             shatter_event = shatter_detector.evaluate(frame_bgr=frame)
 
             people = len(detections.get("people", []))
             counts = detections.get("counts", {})
+
+            # Draw visualization bounding boxes
+            detector.draw_boxes(frame, detections)
+
+            # Apply zero-PII face obfuscation if enabled
+            if active_config.get("anonymize_faces", True):
+                anonymizer.anonymize(frame)
+
+            # Encode frame to JPEG for local webview streaming
+            ret, jpeg = cv2.imencode('.jpg', frame, [int(cv2.IMWRITE_JPEG_QUALITY), 65])
+            if ret:
+                latest_jpeg_frame = jpeg.tobytes()
 
             now = time.time()
             if now - last_log >= 1.0:
@@ -187,6 +220,44 @@ async def websocket_telemetry(websocket: WebSocket):
                 await websocket.send_text("pong")
     except WebSocketDisconnect:
         await hub.disconnect(websocket)
+
+
+@app.get("/config")
+async def get_config():
+    return active_config
+
+
+@app.post("/config")
+async def update_config(payload: ConfigPayload):
+    if payload.confidence is not None:
+        active_config["confidence"] = max(0.1, min(0.95, payload.confidence))
+    if payload.anonymize_faces is not None:
+        active_config["anonymize_faces"] = payload.anonymize_faces
+    if payload.source is not None:
+        if isinstance(payload.source, str) and payload.source.isdigit():
+            active_config["source"] = int(payload.source)
+        else:
+            active_config["source"] = payload.source
+    logger.info(f"Updated live config: {active_config}")
+    return {"status": "updated", "config": active_config}
+
+
+def _mjpeg_stream_generator():
+    """100% Local MJPEG frame generator streaming directly to desktop app."""
+    while True:
+        if latest_jpeg_frame is not None:
+            yield (b'--frame\r\n'
+                   b'Content-Type: image/jpeg\r\n\r\n' + latest_jpeg_frame + b'\r\n')
+        time.sleep(0.033)  # ~30 FPS
+
+
+@app.get("/stream/video")
+async def stream_video():
+    """Streams live annotated video to Moza Desktop Studio over local loopback."""
+    return StreamingResponse(
+        _mjpeg_stream_generator(),
+        media_type="multipart/x-mixed-replace; boundary=frame"
+    )
 
 
 def main():
