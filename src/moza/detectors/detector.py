@@ -1,9 +1,17 @@
 """
-Multi-class object detection using YOLO or MediaPipe.
+Multi-class object detection using YOLOX (ONNX Runtime) or MediaPipe.
 Detects people, beverages (bottles, cups, wine glasses), hazards (knives), and devices.
+
+YOLOX (https://github.com/Megvii-BaseDetection/YOLOX) is licensed under Apache-2.0
+and runs here through ONNX Runtime (MIT). No AGPL code or weights are used.
 """
 
+import os
+import urllib.request
+from pathlib import Path
 from typing import Dict, List, Optional, Tuple, Any
+
+import numpy as np
 
 from ..core.interfaces import BaseDetector
 from ..core.models import ObjectCategory
@@ -16,10 +24,97 @@ except ImportError:
     MEDIAPIPE_AVAILABLE = False
 
 try:
-    from ultralytics import YOLO
+    import onnxruntime as ort
     YOLO_AVAILABLE = True
 except ImportError:
     YOLO_AVAILABLE = False
+
+# Official Apache-2.0 YOLOX ONNX exports (COCO, 80 classes)
+YOLOX_RELEASE_URL = "https://github.com/Megvii-BaseDetection/YOLOX/releases/download/0.1.1rc0/{name}"
+DEFAULT_MODEL_NAME = os.environ.get("MOZA_MODEL", "yolox_s.onnx")
+DEFAULT_MODEL_DIR = Path(os.environ.get("MOZA_MODEL_DIR", "models"))
+NMS_IOU_THRESHOLD = 0.45
+
+
+def ensure_model(model_name: str = DEFAULT_MODEL_NAME, model_dir: Path = DEFAULT_MODEL_DIR) -> Path:
+    """Return a local path to the YOLOX ONNX model, downloading it on first use."""
+    path = Path(model_name)
+    if path.is_file():
+        return path
+    path = Path(model_dir) / path.name
+    if not path.is_file():
+        path.parent.mkdir(parents=True, exist_ok=True)
+        url = YOLOX_RELEASE_URL.format(name=path.name)
+        logger.info(f"Downloading YOLOX model {path.name} from {url}")
+        tmp = path.with_suffix(".part")
+        urllib.request.urlretrieve(url, tmp)
+        tmp.replace(path)
+    return path
+
+
+class YoloxOnnx:
+    """Minimal YOLOX inference wrapper on ONNX Runtime (mirrors the official YOLOX ONNX demo)."""
+
+    def __init__(self, model_path: Path):
+        providers = [p for p in ("CUDAExecutionProvider", "DmlExecutionProvider", "CPUExecutionProvider")
+                     if p in ort.get_available_providers()]
+        self.session = ort.InferenceSession(str(model_path), providers=providers)
+        inp = self.session.get_inputs()[0]
+        self.input_name = inp.name
+        self.input_h, self.input_w = int(inp.shape[2]), int(inp.shape[3])
+        self.grids, self.strides = self._make_grids(self.input_h, self.input_w)
+
+    @staticmethod
+    def _make_grids(h: int, w: int, strides=(8, 16, 32)) -> Tuple[np.ndarray, np.ndarray]:
+        grids, expanded = [], []
+        for s in strides:
+            hs, ws = h // s, w // s
+            xv, yv = np.meshgrid(np.arange(ws), np.arange(hs))
+            grid = np.stack((xv, yv), 2).reshape(-1, 2)
+            grids.append(grid)
+            expanded.append(np.full((grid.shape[0], 1), s))
+        return np.concatenate(grids).astype(np.float32), np.concatenate(expanded).astype(np.float32)
+
+    def _preprocess(self, frame: np.ndarray) -> Tuple[np.ndarray, float]:
+        import cv2
+        h, w = frame.shape[:2]
+        ratio = min(self.input_h / h, self.input_w / w)
+        resized = cv2.resize(frame, (int(w * ratio), int(h * ratio)), interpolation=cv2.INTER_LINEAR)
+        padded = np.full((self.input_h, self.input_w, 3), 114, dtype=np.uint8)
+        padded[: resized.shape[0], : resized.shape[1]] = resized
+        blob = padded.transpose(2, 0, 1)[None].astype(np.float32)
+        return np.ascontiguousarray(blob), ratio
+
+    def __call__(self, frame: np.ndarray, conf: float) -> List[Tuple[Tuple[int, int, int, int], float, int]]:
+        """Run inference. Returns [((x1, y1, x2, y2), score, class_id), ...] in frame coordinates."""
+        import cv2
+        blob, ratio = self._preprocess(frame)
+        out = self.session.run(None, {self.input_name: blob})[0][0]
+
+        xy = (out[:, :2] + self.grids) * self.strides
+        wh = np.exp(out[:, 2:4]) * self.strides
+        cls_scores = out[:, 5:] * out[:, 4:5]
+        cls_ids = cls_scores.argmax(1)
+        scores = cls_scores[np.arange(len(cls_ids)), cls_ids]
+
+        keep = scores >= conf
+        if not keep.any():
+            return []
+        xy, wh, scores, cls_ids = xy[keep] / ratio, wh[keep] / ratio, scores[keep], cls_ids[keep]
+        boxes_xywh = np.concatenate([xy - wh / 2, wh], axis=1)
+
+        h, w = frame.shape[:2]
+        detections = []
+        for cid in np.unique(cls_ids):
+            idx = np.where(cls_ids == cid)[0]
+            kept = cv2.dnn.NMSBoxes(boxes_xywh[idx].tolist(), scores[idx].tolist(), conf, NMS_IOU_THRESHOLD)
+            for k in np.array(kept).flatten():
+                i = idx[int(k)]
+                x, y, bw, bh = boxes_xywh[i]
+                x1, y1 = max(0, int(x)), max(0, int(y))
+                x2, y2 = min(w, int(x + bw)), min(h, int(y + bh))
+                detections.append(((x1, y1, x2, y2), float(scores[i]), int(cid)))
+        return detections
 
 
 # Standard COCO class mappings (Class ID -> (Class Label, Category))
@@ -44,7 +139,7 @@ CATEGORY_COLORS: Dict[ObjectCategory, Tuple[int, int, int]] = {
 
 class PersonDetector(BaseDetector):
     """
-    Multi-class object detection suite supporting YOLO and MediaPipe.
+    Multi-class object detection suite supporting YOLOX (ONNX Runtime) and MediaPipe.
     Implements BaseDetector abstract interface.
     """
 
@@ -53,7 +148,7 @@ class PersonDetector(BaseDetector):
         confidence_threshold: float = 0.35,
         use_yolo: bool = True,
         detect_objects: bool = True,
-        model_name: str = "yolov8n.pt"
+        model_name: str = DEFAULT_MODEL_NAME
     ):
         self.confidence_threshold = confidence_threshold
         self.use_yolo = use_yolo and YOLO_AVAILABLE
@@ -70,12 +165,12 @@ class PersonDetector(BaseDetector):
             logger.warning("Neither YOLO nor MediaPipe is available. Running in dummy detector mode.")
 
     def _init_yolo(self) -> None:
-        """Initialize Ultralytics YOLO model."""
+        """Initialize YOLOX ONNX model (Apache-2.0)."""
         try:
-            self.model = YOLO(self.model_name)
-            logger.success(f"YOLO initialized ({self.model_name}) with conf={self.confidence_threshold}")
+            self.model = YoloxOnnx(ensure_model(self.model_name))
+            logger.success(f"YOLOX initialized ({self.model_name}) with conf={self.confidence_threshold}")
         except Exception as e:
-            logger.error(f"Failed to load YOLO model: {e}. Falling back to MediaPipe.")
+            logger.error(f"Failed to load YOLOX model: {e}. Falling back to MediaPipe.")
             self.use_yolo = False
             if MEDIAPIPE_AVAILABLE:
                 self._init_mediapipe()
@@ -125,7 +220,7 @@ class PersonDetector(BaseDetector):
         return results
 
     def _detect_yolo(self, frame) -> Dict[str, Any]:
-        """Inference with YOLO."""
+        """Inference with YOLOX."""
         res = {
             "people": [],
             "beverages": [],
@@ -135,16 +230,7 @@ class PersonDetector(BaseDetector):
         }
 
         # Run inference
-        predictions = self.model(frame, conf=self.confidence_threshold, verbose=False)
-        if not predictions:
-            return res
-
-        boxes = predictions[0].boxes
-        for box in boxes:
-            cls_id = int(box.cls[0].item())
-            conf = float(box.conf[0].item())
-            coords = tuple(map(int, box.xyxy[0].tolist()))
-
+        for coords, conf, cls_id in self.model(frame, conf=self.confidence_threshold):
             if cls_id in COCO_MAPPINGS:
                 label, category = COCO_MAPPINGS[cls_id]
                 res["counts"][label] = res["counts"].get(label, 0) + 1

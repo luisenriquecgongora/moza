@@ -29,7 +29,7 @@ RUN pip install --no-cache-dir \
     "loguru>=0.7.0" \
     "numpy>=1.24.0" \
     "opencv-python-headless>=4.8.0" \
-    "ultralytics>=8.2.0" \
+    "onnxruntime>=1.17.0" \
     "simpleeval>=0.9.13" \
     "scipy>=1.11.0"
 
@@ -56,11 +56,14 @@ COPY --from=builder /opt/venv /opt/venv
 ENV PATH="/opt/venv/bin:$PATH" \
     PYTHONUNBUFFERED=1 \
     PYTHONDONTWRITEBYTECODE=1 \
-    PYTHONPATH="/app/src"
+    PYTHONPATH="/app/src" \
+    MOZA_MODEL_DIR="/app/models"
 
 # Create unprivileged system user
 RUN groupadd -r moza && useradd -r -g moza -d /app -s /sbin/nologin moza && \
-    mkdir -p /app/data /app/configs && \
+    mkdir -p /app/data /app/configs /app/models && \
+    curl -fsSL -o /app/models/yolox_s.onnx \
+      https://github.com/Megvii-BaseDetection/YOLOX/releases/download/0.1.1rc0/yolox_s.onnx && \
     chown -R moza:moza /app
 
 # Copy application source code and configurations
