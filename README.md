@@ -5,7 +5,7 @@
 > **Python 3.12 / YOLOX (ONNX Runtime) / MediaPipe Edge Perception Daemon & Featherweight Client SDK**  
 > Real-time crowd density, transparent glassware & cocktail tracking, broken glass hazard detection, and automated spatial telemetry for hospitality and commercial spaces.
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-teal.svg)](https://opensource.org/licenses/MIT)
+[![License: PolyForm Shield 1.0.0](https://img.shields.io/badge/License-PolyForm_Shield_1.0.0-teal.svg)](LICENSE)
 [![Edge Accelerated](https://img.shields.io/badge/Inference-ONNX_DirectML_CUDA-emerald.svg)](https://onnxruntime.ai)
 [![Zero-PII Privacy](https://img.shields.io/badge/Privacy-Zero--PII_Invariants-blue.svg)](#-zero-pii-privacy-invariants)
 [![Glassware Detection](https://img.shields.io/badge/Glassware-Refraction_Aware-purple.svg)](FUTURE_PLANS.md#initiative-1-transparent-glassware--cocktail-vessel-perception)
@@ -145,4 +145,12 @@ Read our comprehensive 10 graduate-level research initiatives in [**FUTURE_PLANS
 ---
 
 ## 📄 License
-MIT License. Free and open source for commercial and research applications.
+Moza is **source-available** under the [PolyForm Shield License 1.0.0](LICENSE). It is not open source.
+
+- ✅ **Free for any business to use**, including commercially, to run its own operations: bars, clubs, venues, shops, companies.
+- ✅ You may read, modify and share the code, as long as you keep the license and the `Required Notice` line.
+- ❌ You may **not** use Moza, or any copy or modified version of it, to provide a product or service that **competes** with Moza or with any product the licensor provides using it.
+
+For commercial, partner, or OEM licensing, contact **luisenriquecgongora@gmail.com**.
+
+Copyright (c) 2026 Luis Enrique. All rights not expressly granted are reserved.

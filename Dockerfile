@@ -40,7 +40,7 @@ FROM python:3.12-slim AS runner
 LABEL org.opencontainers.image.title="moza-vision" \
       org.opencontainers.image.description="Autonomous edge vision, cocktail perception & venue spatial intelligence engine" \
       org.opencontainers.image.version="0.1.0" \
-      org.opencontainers.image.licenses="MIT"
+      org.opencontainers.image.licenses="LicenseRef-PolyForm-Shield-1.0.0"
 
 WORKDIR /app
 
