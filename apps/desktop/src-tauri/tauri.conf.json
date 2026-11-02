@@ -1,0 +1,34 @@
+{
+  "$schema": "https://schema.tauri.app/config/2",
+  "productName": "Moza",
+  "version": "0.1.0",
+  "identifier": "com.luisenriquecgongora.moza",
+  "build": {
+    "beforeDevCommand": "npm run dev",
+    "beforeBuildCommand": "npm run build",
+    "devUrl": "http://localhost:3302",
+    "frontendDist": "../dist"
+  },
+  "app": {
+    "windows": [
+      {
+        "title": "Moza — 3D Spatial Vision & Venue Intelligence Studio",
+        "width": 1440,
+        "height": 900,
+        "minWidth": 1024,
+        "minHeight": 700,
+        "resizable": true,
+        "fullscreen": false,
+        "decorations": true,
+        "theme": "Dark"
+      }
+    ],
+    "security": {
+      "csp": "default-src 'self' blob: data: 'unsafe-inline' 'unsafe-eval'; connect-src 'self' ws: wss: http: https:;"
+    }
+  },
+  "bundle": {
+    "active": true,
+    "targets": "all"
+  }
+}
