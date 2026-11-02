@@ -4,7 +4,7 @@ Unit tests for ShatterDetector
 
 import numpy as np
 import pytest
-from argus.detectors.shatter import ShatterDetector
+from moza.detectors.shatter import ShatterDetector
 
 
 def test_shatter_detector_audio_impulse():

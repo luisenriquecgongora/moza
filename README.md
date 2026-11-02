@@ -1,6 +1,6 @@
-# Argus 👁️
+# Moza 🍸
 
-> *"Watch closely. The room tells its own story."*  
+> *"At your service. Vision, cocktail perception & venue spatial intelligence for modern spaces."*  
 > **Autonomous Edge Vision & Multimodal Venue Spatial Intelligence Engine**  
 > **Python 3.12 / YOLOv11 / MediaPipe / ONNX Runtime Edge Perception Daemon & Featherweight Client SDK**  
 > Real-time crowd density, transparent glassware & cocktail tracking, broken glass hazard detection, and automated spatial telemetry for hospitality and commercial spaces.
@@ -53,8 +53,8 @@ flowchart TD
     end
 
     subgraph Interface["Distribution & Clients"]
-        Daemon["Argus Server (FastAPI / WebSocket / IPC)"]
-        Client["ArgusClient SDK (Featherweight, 0 CV Deps)"]
+        Daemon["Moza Server (FastAPI / WebSocket / IPC)"]
+        Client["MozaClient SDK (Featherweight, 0 CV Deps)"]
         RobotHost["Takient Robot Host"]
         Bobby["Bobby 3D Spatial CAD"]
     end
@@ -73,9 +73,9 @@ flowchart TD
 
 | If You Want To... | Target Component | Technology | Offline? |
 | :--- | :--- | :--- | :---: |
-| **Run vision intelligence on an edge device / camera** | `services/argus_server` | Python 3.12 / FastAPI / ONNX | **100% Offline** |
-| **Integrate detection into Robot Host or custom app** | `clients/python/argus_client` | Python (Zero Heavy CV Deps) | **100% Offline** |
-| **Run standalone CLI detection with OpenCV UI** | `src/argus/cli.py` | OpenCV / YOLO / MediaPipe | **100% Offline** |
+| **Run vision intelligence on an edge device / camera** | `services/moza_server` | Python 3.12 / FastAPI / ONNX | **100% Offline** |
+| **Integrate detection into Robot Host or custom app** | `clients/python/moza_client` | Python (Zero Heavy CV Deps) | **100% Offline** |
+| **Run standalone CLI detection with OpenCV UI** | `src/moza/cli.py` | OpenCV / YOLO / MediaPipe | **100% Offline** |
 | **Configure venue occupancy & hazard rules** | `configs/rules/crowd_density.json` | JSON SafeEval Rules | **100% Offline** |
 
 ---
@@ -85,8 +85,8 @@ flowchart TD
 ### 1. Installation
 ```bash
 # Clone the repository
-git clone https://github.com/luisenriquecgongora/argus.git
-cd argus
+git clone https://github.com/luisenriquecgongora/moza.git
+cd moza
 
 # Install core engine
 pip install -e ".[server,audio]"
@@ -95,33 +95,33 @@ pip install -e ".[server,audio]"
 ### 2. Run the Detection CLI
 ```bash
 # Launch interactive camera detection with multi-class models
-python -m argus.cli --camera 0 --resolution 1280x720 --confidence 0.35
+python -m moza.cli --source 0 --resolution 1280x720 --confidence 0.35
 ```
 
-### 3. Start the Argus Streaming Server
+### 3. Start the Moza Streaming Server
 ```bash
 # Start edge daemon on port 8100
-python -m services.argus_server.main --port 8100
+python -m services.moza_server.main --port 8100
 ```
 
 ### 4. Featherweight Client Usage (e.g. inside `robot_host`)
 ```python
-from argus_client import ArgusClient
+from moza_client import MozaClient
 
-# Connect to local or network Argus daemon (0 heavy CV dependencies required!)
-client = ArgusClient(host="127.0.0.1", port=8100)
+# Connect to local or network Moza daemon (0 heavy CV dependencies required!)
+client = MozaClient(host="127.0.0.1", port=8100)
 client.connect()
 
-# Stream live telemetry
-for telemetry in client.stream_telemetry():
-    print(f"People: {telemetry.people_count}, Cocktails: {telemetry.bottle_count}")
+# Fetch latest telemetry
+telemetry = client.get_current_metrics()
+print(f"People: {telemetry.people_count}, Cocktails: {telemetry.bottle_count}")
 ```
 
 ---
 
 ## 🛡️ Zero-PII Privacy Invariants
 
-Argus is engineered ground-up for commercial hospitality and public venues:
+Moza is engineered ground-up for commercial hospitality and public venues:
 1. **On-Edge Face Blurring**: Facial regions are blurred in memory before any frame buffer touches the disk or network.
 2. **Zero Biometric Identity Storage**: Patrons are tracked via anonymous bounding-box geometry and centroid trajectories. No facial embeddings or biometric profiles are ever generated or persisted.
 3. **Differential Privacy for Aggregate Trends**: Public crowd reports utilize Laplace noise perturbation to prevent individual patron tracking.

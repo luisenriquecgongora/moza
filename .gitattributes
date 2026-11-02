@@ -1,5 +1,5 @@
 # GitHub Linguist Language Detection Configuration
-# Establishes Python as the Primary Language for Argus
+# Establishes Python as the Primary Language for Moza
 
 # Mark documentation and test suites
 **/*.test.py linguist-documentation
@@ -7,8 +7,8 @@ tests/** linguist-documentation
 docs/** linguist-documentation
 
 # Primary Python library and service detection
-src/argus/**/*.py linguist-detectable=true
-src/argus/**/*.py linguist-language=Python
+src/moza/**/*.py linguist-detectable=true
+src/moza/**/*.py linguist-language=Python
 services/**/*.py linguist-detectable=true
 services/**/*.py linguist-language=Python
 clients/**/*.py linguist-detectable=true

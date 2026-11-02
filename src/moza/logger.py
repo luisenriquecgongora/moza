@@ -1,5 +1,5 @@
 """
-Argus Logging System
+Moza Logging System
 Configures Loguru logger with structured formats and optional stdout fallback.
 """
 
@@ -19,5 +19,5 @@ except ImportError:
         level=logging.INFO,
         format="%(asctime)s | %(levelname)-8s | %(name)s:%(lineno)d - %(message)s"
     )
-    logger = logging.getLogger("argus")
+    logger = logging.getLogger("moza")
     logger.success = logger.info

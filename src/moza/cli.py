@@ -1,5 +1,5 @@
 """
-Argus Standalone Interactive CLI.
+Moza Standalone Interactive CLI.
 Run detection directly on webcam or RTSP stream with OpenCV display.
 """
 
@@ -16,7 +16,7 @@ from .logger import logger
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Argus Edge Vision & Venue Intelligence CLI")
+    parser = argparse.ArgumentParser(description="Moza Edge Vision & Venue Intelligence CLI")
     parser.add_argument("--source", default=0, help="Camera index (0, 1) or RTSP URL or video file")
     parser.add_argument("--resolution", default="1280x720", help="Resolution WxH (default: 1280x720)")
     parser.add_argument("--confidence", type=float, default=0.35, help="Confidence threshold (default: 0.35)")
@@ -34,7 +34,7 @@ def main():
     # Parse source
     source = int(args.source) if str(args.source).isdigit() else str(args.source)
 
-    logger.info("👁️ Starting Argus Edge Vision System")
+    logger.info("👁️ Starting Moza Edge Vision System")
     camera = CameraManager(source=source, resolution=(w, h))
     detector = PersonDetector(
         confidence_threshold=args.confidence,
@@ -90,7 +90,7 @@ def main():
                 last_stats_time = now
 
             # Show GUI window
-            cv2.imshow("Argus Vision Engine - Press 'q' to exit", frame)
+            cv2.imshow("Moza Vision Engine - Press 'q' to exit", frame)
             if cv2.waitKey(1) & 0xFF == ord('q'):
                 logger.info("User requested exit.")
                 break
@@ -98,7 +98,7 @@ def main():
     finally:
         camera.stop()
         cv2.destroyAllWindows()
-        logger.info("Argus CLI shutdown complete.")
+        logger.info("Moza CLI shutdown complete.")
 
 
 if __name__ == "__main__":

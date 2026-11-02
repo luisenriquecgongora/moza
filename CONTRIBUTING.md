@@ -1,6 +1,6 @@
-# Contributing to Argus
+# Contributing to Moza
 
-Thank you for contributing to Argus, the open-source real-time vision and venue spatial intelligence engine.
+Thank you for contributing to Moza, the open-source real-time vision, cocktail perception, and venue spatial intelligence engine.
 
 ## Commit Standards
 Every commit must adhere to [Conventional Commits](https://www.conventionalcommits.org/):
@@ -17,8 +17,8 @@ Maximum 5 staged files per atomic commit. See `AGENTS.md` for full requirements.
 ## Development Setup
 ```bash
 # Clone the repository
-git clone https://github.com/luisenriquecgongora/argus.git
-cd argus
+git clone https://github.com/luisenriquecgongora/moza.git
+cd moza
 
 # Create virtual environment
 python -m venv .venv

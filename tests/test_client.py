@@ -1,12 +1,12 @@
 """
-Unit tests for ArgusClient data parsing
+Unit tests for MozaClient data parsing
 """
 
-from argus_client.client import ArgusTelemetry, ArgusClient
+from moza_client.client import MozaTelemetry, MozaClient
 
 
 def test_telemetry_instantiation():
-    t = ArgusTelemetry(
+    t = MozaTelemetry(
         status="running",
         people_count=18,
         bottle_count=5,

@@ -1,11 +1,11 @@
 """
-Unit tests for Argus AnalyticsEngine
+Unit tests for Moza AnalyticsEngine
 """
 
 import os
 import tempfile
 import pytest
-from argus.analytics.engine import AnalyticsEngine
+from moza.analytics.engine import AnalyticsEngine
 
 
 def test_analytics_logging_and_metrics():

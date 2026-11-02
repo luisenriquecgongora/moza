@@ -3,7 +3,7 @@ requires = ["setuptools>=68.0.0", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "argus-vision"
+name = "moza-vision"
 version = "0.1.0"
 description = "Real-Time Edge Vision & Venue Spatial Intelligence Engine: Transparent Glassware, Crowd Dynamics, Hazard Alerts & Telemetry"
 authors = [{ name = "Luis Enrique", email = "luisenriquecgongora@gmail.com" }]
@@ -43,7 +43,7 @@ dev = [
 ]
 
 [project.scripts]
-argus = "argus.cli:main"
+moza = "moza.cli:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]

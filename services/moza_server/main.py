@@ -1,5 +1,5 @@
 """
-Argus Server: Production FastAPI & WebSocket Telemetry Streaming Daemon.
+Moza Server: Production FastAPI & WebSocket Telemetry Streaming Daemon.
 Runs edge perception in background worker and exposes real-time telemetry over WebSockets and REST.
 """
 
@@ -12,15 +12,15 @@ from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
 import uvicorn
 
-from argus.capture.camera import CameraManager
-from argus.detectors.detector import PersonDetector
-from argus.detectors.shatter import ShatterDetector
-from argus.analytics.engine import AnalyticsEngine
-from argus.rules.decision_engine import DecisionEngine
-from argus.logger import logger
+from moza.capture.camera import CameraManager
+from moza.detectors.detector import PersonDetector
+from moza.detectors.shatter import ShatterDetector
+from moza.analytics.engine import AnalyticsEngine
+from moza.rules.decision_engine import DecisionEngine
+from moza.logger import logger
 
 app = FastAPI(
-    title="Argus Vision Server",
+    title="Moza Vision Server",
     description="Real-Time Edge Vision & Venue Spatial Intelligence Daemon",
     version="0.1.0"
 )
@@ -91,7 +91,7 @@ def background_vision_worker(camera_source: int = 0, confidence: float = 0.35):
         decision_engine = DecisionEngine()
 
         camera.start()
-        logger.info("Argus background vision worker running...")
+        logger.info("Moza background vision worker running...")
 
         last_log = time.time()
 
@@ -168,7 +168,7 @@ async def on_startup():
 
 @app.get("/health")
 async def health_check():
-    return {"status": "healthy", "service": "argus-server", "version": "0.1.0"}
+    return {"status": "healthy", "service": "moza-server", "version": "0.1.0"}
 
 
 @app.get("/metrics/current")
@@ -190,7 +190,7 @@ async def websocket_telemetry(websocket: WebSocket):
 
 
 def main():
-    uvicorn.run("services.argus_server.main:app", host="0.0.0.0", port=8100, reload=False)
+    uvicorn.run("services.moza_server.main:app", host="0.0.0.0", port=8100, reload=False)
 
 
 if __name__ == "__main__":

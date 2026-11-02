@@ -1,4 +1,4 @@
-# 🎓 Argus Future Research & Engineering Roadmap
+# 🎓 Moza Future Research & Engineering Roadmap
 
 > **Comprehensive Technical Blueprint & Academic Initiatives for Advanced Computer Vision & Edge Spatial Intelligence**  
 > *Designed as a Master of Science in Artificial Intelligence / Computer Vision Capstone Portfolio & Research Track.*  
@@ -8,7 +8,7 @@
 
 ## 🧭 Executive Summary
 
-This roadmap articulates ten graduate-level research and systems engineering initiatives for the `argus` computer vision engine. Each proposal bridges classical digital image processing, deep neural perception, optical physics, stochastic queueing models, and production edge systems engineering in Python and C++.
+This roadmap articulates ten graduate-level research and systems engineering initiatives for the `Moza` computer vision engine. Each proposal bridges classical digital image processing, deep neural perception, optical physics, stochastic queueing models, and production edge systems engineering in Python and C++.
 
 ```
 ┌────────────────────────────────────────────────────────────────────────────────────────┐
@@ -43,7 +43,7 @@ where $\nabla M$ denotes Sobel-filtered boundary ground truth, compelling the mo
 
 $$\mathcal{L}_{\text{Boundary}} = 1 - \frac{2 \sum |\nabla M \cdot \nabla \hat{M}|}{\sum |\nabla M|^2 + \sum |\nabla \hat{M}|^2}$$
 
-#### 3. Concrete Implementation Plan (`src/argus/detectors/glassware.py`)
+#### 3. Concrete Implementation Plan (`src/Moza/detectors/glassware.py`)
 - Fine-tune a lightweight **YOLOv11-Seg / MobileSAM** on the **Trans10K** and **ClearPose** transparent object datasets.
 - Implement an edge post-processor that detects the elliptical opening (rim) and base of cocktail glasses using Hough Ellipse Fitting to calculate 3D vessel tilt and orientation vectors.
 
@@ -63,7 +63,7 @@ Beverage chromaticity classification: Computing normalized HSV / CIE-$L^*a^*b^*$
 $$D_{\text{KL}}(P_{\text{observed}} \parallel Q_{\text{catalog}}) = \sum_{x \in \mathcal{X}} P(x) \log\left(\frac{P(x)}{Q(x)}\right)$$
 This enables distinguishing stout/porter, red wine, amber spirits, cocktails, and clear water without active illumination.
 
-#### 3. Concrete Implementation Plan (`src/argus/analytics/beverage_tracker.py`)
+#### 3. Concrete Implementation Plan (`src/Moza/analytics/beverage_tracker.py`)
 - Segment the liquid core within detected glassware masks.
 - Output real-time volumetric state flags:
   - `FULL (80-100%)`
@@ -86,7 +86,7 @@ $$S_{\text{shatter}} = \sigma\left( w_a \cdot f_{\text{audio}}(\mathbf{X}_{\text
 - **Acoustic Signature**: Brittle fracture creates a distinctive acoustic shockwave with a sudden impulse rise-time ($<2\text{ ms}$) and high energy concentration between $3\text{ kHz}$ and $8\text{ kHz}$ followed by high-frequency ringing decay.
 - **Visual Signature**: Downward vertical trajectory of vessel centroid followed by instantaneous radial shard dispersion and high-frequency specular glint clusters on the floor plane.
 
-#### 3. Concrete Implementation Plan (`src/argus/detectors/shatter.py`)
+#### 3. Concrete Implementation Plan (`src/Moza/detectors/shatter.py`)
 - Audio pipeline: Ring-buffer STFT fed into a 1D CNN / YamNet subnetwork trained on brittle fracture impulse samples.
 - Visual pipeline: Optical flow delta + floor plane specular anomaly detector.
 - Priority: Immediate `PRIORITY 10` security alert dispatch with video snippet extraction (5 seconds pre-event + 5 seconds post-event).
@@ -107,7 +107,7 @@ Using Gaussian kernel convolution over annotated head centroids:
 $$D(x) = \sum_{i=1}^{N} \mathcal{N}(x; \mu_i, \sigma_i^2 \mathbf{I})$$
 where $\sigma_i = \beta \bar{d}_i^k$ is adaptively determined by average distance $\bar{d}_i^k$ to $k$-nearest neighbors.
 
-#### 3. Concrete Implementation Plan (`src/argus/detectors/crowd_density.py`)
+#### 3. Concrete Implementation Plan (`src/Moza/detectors/crowd_density.py`)
 - Deploy a dilated convolutional network (CSRNet / DM-Count) quantized to ONNX INT8.
 - Output 2D density heatmaps that feed directly into Bobby's 3D spatial venue maps.
 
@@ -125,7 +125,7 @@ $$\begin{bmatrix} X \\ Y \\ 1 \end{bmatrix} \sim \mathbf{H} \begin{bmatrix} u \\
 
 Tracking across blind zones via ByteTrack + spatial kalman filters with zero face/identity recognition (strictly anonymous trajectory tracking).
 
-#### 3. Concrete Implementation Plan (`src/argus/spatial/projection.py`)
+#### 3. Concrete Implementation Plan (`src/Moza/spatial/projection.py`)
 - 4-point interactive calibration tool in CLI/Web UI to map camera pixels to Bobby venue coordinates.
 - Unified multi-zone telemetry stream: Bar, VIP, Entrance, Dance Floor.
 
@@ -145,7 +145,7 @@ Temporal tracking of patron trajectory states:
 - Service Latency: $T_{\text{service}} = \tau_{\text{service}} - \tau_{\text{arrive}}$.
 - Queue utilization parameter $\rho = \frac{\lambda}{c \mu}$.
 
-#### 3. Concrete Implementation Plan (`src/argus/analytics/queue_engine.py`)
+#### 3. Concrete Implementation Plan (`src/Moza/analytics/queue_engine.py`)
 - Define parametric polygons for ordering counter vs. waiting line.
 - Compute real-time queue length, average wait time (moving 5-min average), and automated staff dispatch alerts when wait exceeds threshold.
 
@@ -166,7 +166,7 @@ Fall invariant criteria:
 2. Major axis aspect ratio change: $\frac{\text{width}}{\text{height}} > 1.5$ (standing vertical orientation rapidly transitions to horizontal floor plane).
 3. Post-impact inactivity: Absence of significant centroid velocity for $\Delta t > 3.0\text{ s}$.
 
-#### 3. Concrete Implementation Plan (`src/argus/detectors/fall_detector.py`)
+#### 3. Concrete Implementation Plan (`src/Moza/detectors/fall_detector.py`)
 - Real-time skeletal evaluation using MediaPipe / RTMPose.
 - Dispatch instant high-priority incident webhook with snapshot coordinates.
 
@@ -185,7 +185,7 @@ Running multiple neural networks (people, glasses, hazards, crowd density) concu
   - Windows: DirectML / TensorRT / OpenVINO
   - Linux/Edge: CUDA / TensorRT / RKNN / CoreML
 
-#### 3. Concrete Implementation Plan (`src/argus/core/shm_buffer.py`)
+#### 3. Concrete Implementation Plan (`src/Moza/core/shm_buffer.py`)
 - Sub-30ms end-to-end inference budget per frame @ 30 FPS.
 - Dynamic frame skip scheduler: Run person detection @ 30 FPS, glass detection @ 10 FPS, crowd density @ 2 FPS.
 
@@ -202,7 +202,7 @@ Commercial venue operators face strict privacy regulations (GDPR, CCPA, BIPA). C
 - Anonymized trajectory vectors with Laplace noise injection for aggregate dwell reporting:
 $$\tilde{M} = M + \text{Laplace}\left(0, \frac{\Delta S}{\epsilon}\right)$$
 
-#### 3. Concrete Implementation Plan (`src/argus/privacy/anonymizer.py`)
+#### 3. Concrete Implementation Plan (`src/Moza/privacy/anonymizer.py`)
 - Configurable edge privacy modes:
   - `FULL_ANONYMIZED` (face blur + license plate blur)
   - `SKELETAL_ONLY` (no raw pixels stored; only 2D stick figures)
@@ -221,6 +221,6 @@ Selective VLM invocation: Small Vision-Language Models (Moondream2 / SmolVLM / P
 - Context Prompt: *"You are an autonomous venue safety agent. In 1 sentence, explain the anomaly occurring in this frame."*
 - Generates human-readable incident summaries for manager notification channels (Slack, SMS, PlaatoOS Dashboard).
 
-#### 3. Concrete Implementation Plan (`src/argus/vlm/incident_describer.py`)
+#### 3. Concrete Implementation Plan (`src/Moza/vlm/incident_describer.py`)
 - 4-bit quantized ONNX / llama.cpp edge VLM runner.
 - Zero cloud dependency: runs completely on local machine.

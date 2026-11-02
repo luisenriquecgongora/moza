@@ -1,6 +1,6 @@
 """
-Featherweight Argus Client.
-Communicates with the standalone Argus server daemon via HTTP or WebSocket.
+Featherweight Moza Client.
+Communicates with the standalone Moza server daemon via HTTP or WebSocket.
 Has ZERO heavy ML/CV dependencies (requires only standard Python libraries).
 """
 
@@ -13,8 +13,8 @@ import time
 
 
 @dataclass
-class ArgusTelemetry:
-    """Telemetry frame received from Argus server."""
+class MozaTelemetry:
+    """Telemetry frame received from Moza server."""
     status: str
     people_count: int
     bottle_count: int
@@ -27,10 +27,10 @@ class ArgusTelemetry:
     timestamp: float
 
 
-class ArgusClient:
+class MozaClient:
     """
     Featherweight client for Takient Robot Host and edge devices.
-    Connects to local or remote Argus vision daemon.
+    Connects to local or remote Moza vision daemon.
     """
 
     def __init__(self, host: str = "127.0.0.1", port: int = 8100, timeout: float = 2.0):
@@ -40,10 +40,10 @@ class ArgusClient:
         self.base_url = f"http://{host}:{port}"
         self._streaming = False
         self._stream_thread: Optional[threading.Thread] = None
-        self._on_telemetry_callback: Optional[Callable[[ArgusTelemetry], None]] = None
+        self._on_telemetry_callback: Optional[Callable[[MozaTelemetry], None]] = None
 
     def is_available(self) -> bool:
-        """Check if Argus server is running and reachable."""
+        """Check if Moza server is running and reachable."""
         try:
             req = urllib.request.Request(f"{self.base_url}/health")
             with urllib.request.urlopen(req, timeout=self.timeout) as resp:
@@ -52,13 +52,13 @@ class ArgusClient:
         except Exception:
             return False
 
-    def get_current_metrics(self) -> Optional[ArgusTelemetry]:
+    def get_current_metrics(self) -> Optional[MozaTelemetry]:
         """Fetch latest detection metrics via HTTP GET."""
         try:
             req = urllib.request.Request(f"{self.base_url}/metrics/current")
             with urllib.request.urlopen(req, timeout=self.timeout) as resp:
                 data = json.loads(resp.read().decode("utf-8"))
-                return ArgusTelemetry(
+                return MozaTelemetry(
                     status=data.get("status", "unknown"),
                     people_count=data.get("people_count", 0),
                     bottle_count=data.get("bottle_count", 0),
@@ -73,7 +73,7 @@ class ArgusClient:
         except Exception:
             return None
 
-    def start_polling(self, interval_seconds: float = 1.0, callback: Optional[Callable[[ArgusTelemetry], None]] = None) -> None:
+    def start_polling(self, interval_seconds: float = 1.0, callback: Optional[Callable[[MozaTelemetry], None]] = None) -> None:
         """Start background polling thread to receive continuous telemetry."""
         if self._streaming:
             return

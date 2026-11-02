@@ -4,7 +4,7 @@ Unit tests for Argus DecisionEngine
 
 from pathlib import Path
 import pytest
-from argus.rules.decision_engine import DecisionEngine
+from moza.rules.decision_engine import DecisionEngine
 
 
 def test_decision_engine_rules():
