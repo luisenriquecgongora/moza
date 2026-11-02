@@ -9,6 +9,7 @@
 [![Edge Accelerated](https://img.shields.io/badge/Inference-ONNX_DirectML_CUDA-emerald.svg)](https://onnxruntime.ai)
 [![Zero-PII Privacy](https://img.shields.io/badge/Privacy-Zero--PII_Invariants-blue.svg)](#-zero-pii-privacy-invariants)
 [![Glassware Detection](https://img.shields.io/badge/Glassware-Refraction_Aware-purple.svg)](FUTURE_PLANS.md#initiative-1-transparent-glassware--cocktail-vessel-perception)
+[![Architecture: SOLID & DRY](https://img.shields.io/badge/Architecture-SOLID_%26_DRY-blue.svg)](ARCHITECTURE.md)
 [![Research Roadmap](https://img.shields.io/badge/Research-10_SOTA_Initiatives-orange.svg)](FUTURE_PLANS.md)
 
 ---
