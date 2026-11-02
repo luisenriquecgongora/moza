@@ -3,38 +3,11 @@ Transparent Glassware, Stemware & Cocktail Perception Engine.
 Detects transparent vessels, extracts liquid meniscus, and estimates fill level.
 """
 
-from dataclasses import dataclass
-from enum import Enum
 from typing import List, Optional, Tuple, Dict, Any
 import numpy as np
 
+from ..core.models import GlassType, FillState, GlassDetection
 from ..logger import logger
-
-
-class GlassType(str, Enum):
-    COCKTAIL = "cocktail_glass"
-    WINE = "wine_glass"
-    TUMBLER = "tumbler"
-    PINT = "pint_glass"
-    BOTTLE = "bottle"
-
-
-class FillState(str, Enum):
-    FULL = "full"            # 80 - 100%
-    CONSUMING = "consuming"  # 20 - 79%
-    EMPTY = "empty"          # < 20%
-    ABANDONED = "abandoned"  # Idle for > 15 minutes
-
-
-@dataclass
-class GlassDetection:
-    """Glassware instance detection."""
-    glass_type: GlassType
-    bbox: Tuple[int, int, int, int]  # (x1, y1, x2, y2)
-    confidence: float
-    fill_ratio: float               # 0.0 to 1.0
-    fill_state: FillState
-    beverage_hue: Optional[str] = None
 
 
 class GlasswareDetector:

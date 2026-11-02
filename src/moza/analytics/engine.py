@@ -11,10 +11,11 @@ from datetime import datetime, timedelta
 from typing import List, Dict, Optional, Any
 from pathlib import Path
 
+from ..core.interfaces import BaseMetricsSink
 from ..logger import logger
 
 
-class AnalyticsEngine:
+class AnalyticsEngine(BaseMetricsSink):
     """
     Real-time analytics processor with sliding window aggregations.
     Derives actionable metrics from raw detections and persists time-series history.

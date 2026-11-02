@@ -3,9 +3,10 @@ Multi-class object detection using YOLO or MediaPipe.
 Detects people, beverages (bottles, cups, wine glasses), hazards (knives), and devices.
 """
 
-from enum import Enum
 from typing import Dict, List, Optional, Tuple, Any
 
+from ..core.interfaces import BaseDetector
+from ..core.models import ObjectCategory
 from ..logger import logger
 
 try:
@@ -19,14 +20,6 @@ try:
     YOLO_AVAILABLE = True
 except ImportError:
     YOLO_AVAILABLE = False
-
-
-class ObjectCategory(str, Enum):
-    """Detection category classifications."""
-    PERSON = "person"
-    BEVERAGE = "beverage"
-    HAZARD = "hazard"
-    DEVICE = "device"
 
 
 # Standard COCO class mappings (Class ID -> (Class Label, Category))
@@ -49,9 +42,10 @@ CATEGORY_COLORS: Dict[ObjectCategory, Tuple[int, int, int]] = {
 }
 
 
-class PersonDetector:
+class PersonDetector(BaseDetector):
     """
     Multi-class object detection suite supporting YOLO and MediaPipe.
+    Implements BaseDetector abstract interface.
     """
 
     def __init__(

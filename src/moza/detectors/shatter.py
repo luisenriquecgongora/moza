@@ -3,22 +3,11 @@ Multimodal Broken Glass & Shatter Detection Engine.
 Fuses high-frequency acoustic shockwave transients with optical specular shard scatter.
 """
 
-from dataclasses import dataclass
 from typing import Optional, Tuple
 import numpy as np
 
+from ..core.models import ShatterEvent
 from ..logger import logger
-
-
-@dataclass
-class ShatterEvent:
-    """Broken glass incident data."""
-    detected: bool
-    confidence: float
-    acoustic_score: float
-    visual_score: float
-    zone_id: str
-    timestamp: float
 
 
 class ShatterDetector:
