@@ -10,6 +10,7 @@
 [![Zero-PII Privacy](https://img.shields.io/badge/Privacy-Zero--PII_Invariants-blue.svg)](#-zero-pii-privacy-invariants)
 [![Glassware Detection](https://img.shields.io/badge/Glassware-Refraction_Aware-purple.svg)](FUTURE_PLANS.md#initiative-1-transparent-glassware--cocktail-vessel-perception)
 [![Architecture: SOLID & DRY](https://img.shields.io/badge/Architecture-SOLID_%26_DRY-blue.svg)](ARCHITECTURE.md)
+[![Docker: Ready](https://img.shields.io/badge/Docker-Multi--Stage_Build-2496ED.svg?logo=docker&logoColor=white)](#-quickstart)
 [![Research Roadmap](https://img.shields.io/badge/Research-10_SOTA_Initiatives-orange.svg)](FUTURE_PLANS.md)
 
 ---
@@ -89,7 +90,10 @@ flowchart TD
 git clone https://github.com/luisenriquecgongora/moza.git
 cd moza
 
-# Install core engine
+# Option A: One-Command Docker Deployment (Recommended for Edge Nodes)
+docker compose up -d
+
+# Option B: Local Python Installation
 pip install -e ".[server,audio]"
 ```
 

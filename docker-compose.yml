@@ -1,0 +1,30 @@
+version: '3.8'
+
+services:
+  moza-engine:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: moza-vision:latest
+    container_name: moza-engine
+    ports:
+      - "8100:8100"
+    environment:
+      - PORT=8100
+      - HOST=0.0.0.0
+      - PYTHONUNBUFFERED=1
+    volumes:
+      - ./data:/app/data
+      - ./configs:/app/configs:ro
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+        reservations:
+          memory: 128M
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8100/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
