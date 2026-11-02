@@ -7,10 +7,11 @@ import threading
 import queue
 from typing import Optional, Tuple, Union
 
+from ..core.interfaces import BaseFrameSource
 from ..logger import logger
 
 
-class CameraManager:
+class CameraManager(BaseFrameSource):
     """
     High-performance camera capture manager.
     Provides non-blocking access to video frames with background buffering.

@@ -8,17 +8,28 @@ from datetime import datetime
 import json
 import urllib.request
 
+from ..core.interfaces import BaseActionChannel
 from ..logger import logger
 
 
-class ActionExecutor:
+class ActionExecutor(BaseActionChannel):
     """
     Executes automated actions triggered by decision rules.
+    Implements BaseActionChannel interface.
     """
 
     def __init__(self, webhook_url: Optional[str] = None):
         self.webhook_url = webhook_url
         self.action_history = []
+
+    def dispatch(self, action_type: str, params: str, context: Dict[str, Any]) -> None:
+        """Route action to appropriate handler method."""
+        if action_type == "notify_staff":
+            self.notify_staff(params, context)
+        elif action_type == "send_alert":
+            self.send_alert(params, context)
+        else:
+            self.log_event(f"{action_type}:{params}", context)
 
     def notify_staff(self, params: str, context: Dict[str, Any]) -> None:
         """Send operational alert to staff via webhook or log."""
