@@ -1,0 +1,189 @@
+{
+  "version": "1.0",
+  "description": "Crowd density and behavior rules for intelligent venue automation",
+  "rules": [
+    {
+      "id": "high_bar_density",
+      "description": "Bar area is crowded (50+ people)",
+      "condition": "person_count > 50 and zone_id == 'bar'",
+      "priority": 3,
+      "cooldown_seconds": 300,
+      "actions": [
+        "notify_staff:bartender_needed",
+        "api_update:room_status=crowded",
+        "log_event:high_bar_density_detected"
+      ]
+    },
+    {
+      "id": "low_crowd_promotion",
+      "description": "Low crowd during peak hours - show promotions",
+      "condition": "person_count < 10 and hour >= 22",
+      "priority": 2,
+      "cooldown_seconds": 600,
+      "actions": [
+        "notify_staff:promote_discounts",
+        "overlay_update:show_qr_promo",
+        "playlist_control:increase_energy"
+      ]
+    },
+    {
+      "id": "entrance_queue_backup",
+      "description": "Long queue at entrance (5+ people waiting)",
+      "condition": "person_count > 5 and zone_id == 'entrance'",
+      "priority": 4,
+      "cooldown_seconds": 180,
+      "actions": [
+        "notify_staff:entrance_backup",
+        "api_update:entrance_wait_time=high",
+        "send_alert:entrance_queue_long"
+      ]
+    },
+    {
+      "id": "dance_floor_active",
+      "description": "Active dancing detected with good crowd",
+      "condition": "person_count > 30 and zone_id == 'dance_floor'",
+      "priority": 2,
+      "cooldown_seconds": 900,
+      "actions": [
+        "playlist_control:maintain_tempo",
+        "log_event:dance_floor_active"
+      ]
+    },
+    {
+      "id": "empty_venue_late",
+      "description": "Very low attendance late at night",
+      "condition": "person_count < 5 and hour >= 23",
+      "priority": 2,
+      "cooldown_seconds": 1800,
+      "actions": [
+        "notify_staff:low_attendance_alert",
+        "overlay_update:show_event_info",
+        "log_event:low_attendance"
+      ]
+    },
+    {
+      "id": "capacity_warning",
+      "description": "Approaching venue capacity (80+ people)",
+      "condition": "person_count > 80",
+      "priority": 5,
+      "cooldown_seconds": 120,
+      "actions": [
+        "send_alert:approaching_capacity",
+        "api_update:room_status=near_capacity",
+        "notify_staff:capacity_warning"
+      ]
+    },
+    {
+      "id": "capacity_exceeded",
+      "description": "Venue capacity exceeded (100+ people)",
+      "condition": "person_count >= 100",
+      "priority": 10,
+      "cooldown_seconds": 60,
+      "actions": [
+        "send_alert:capacity_exceeded",
+        "api_update:room_status=full",
+        "notify_staff:stop_entry"
+      ]
+    },
+    {
+      "id": "crowd_increasing_fast",
+      "description": "Rapid crowd growth detected",
+      "condition": "trend == 'increasing' and person_count > 20",
+      "priority": 3,
+      "cooldown_seconds": 600,
+      "actions": [
+        "notify_staff:crowd_growing",
+        "log_event:rapid_crowd_increase"
+      ]
+    },
+    {
+      "id": "crowd_decreasing_early",
+      "description": "People leaving early (before midnight)",
+      "condition": "trend == 'decreasing' and person_count < 15 and hour < 24",
+      "priority": 3,
+      "cooldown_seconds": 900,
+      "actions": [
+        "notify_staff:early_exit_trend",
+        "playlist_control:increase_energy",
+        "log_event:early_exit_pattern"
+      ]
+    },
+    {
+      "id": "vip_area_empty",
+      "description": "VIP area is empty",
+      "condition": "person_count == 0 and zone_id == 'vip'",
+      "priority": 1,
+      "cooldown_seconds": 1800,
+      "actions": [
+        "notify_staff:vip_unused",
+        "log_event:vip_area_empty"
+      ]
+    },
+    {
+      "id": "knife_detected",
+      "description": "Knife detected in venue - SECURITY ALERT",
+      "condition": "knife_count > 0",
+      "priority": 10,
+      "cooldown_seconds": 30,
+      "actions": [
+        "send_alert:KNIFE_DETECTED",
+        "log_event:hazard_knife_detected"
+      ]
+    },
+    {
+      "id": "high_beverage_consumption",
+      "description": "High beverage count detected - monitor consumption",
+      "condition": "total_beverages > 20 and person_count < 15",
+      "priority": 4,
+      "cooldown_seconds": 600,
+      "actions": [
+        "log_event:high_beverage_consumption"
+      ]
+    },
+    {
+      "id": "low_beverage_service",
+      "description": "Low beverage count with good crowd - service opportunity",
+      "condition": "person_count > 20 and total_beverages < 5",
+      "priority": 3,
+      "cooldown_seconds": 300,
+      "actions": [
+        "log_event:low_beverage_service"
+      ]
+    },
+    {
+      "id": "beverage_tracking",
+      "description": "Regular beverage analytics logging",
+      "condition": "total_beverages > 0",
+      "priority": 1,
+      "cooldown_seconds": 300,
+      "actions": [
+        "log_event:beverage_count_logged"
+      ]
+    }
+  ],
+  "context_variables": {
+    "person_count": "Number of people detected in zone",
+    "zone_id": "Zone identifier (bar, entrance, dance_floor, vip, main)",
+    "trend": "Crowd trend (increasing, decreasing, stable)",
+    "hour": "Current hour (0-23)",
+    "avg_count": "Average person count in window",
+    "max_count": "Peak person count in window",
+    "room_id": "Room identifier for API updates",
+    "bottle_count": "Number of bottles detected",
+    "cup_count": "Number of cups detected",
+    "wine_glass_count": "Number of wine glasses detected",
+    "total_beverages": "Total beverages (bottles + cups + glasses)",
+    "knife_count": "Number of knives detected (HAZARD)",
+    "total_hazards": "Total hazards detected",
+    "phone_count": "Number of cell phones detected"
+  },
+  "action_types": {
+    "notify_staff": "Send notification to staff via API",
+    "api_update": "Update room/venue status via API",
+    "playlist_control": "Control playlist behavior (energy, tempo, skip)",
+    "overlay_update": "Update overlay content on screens",
+    "light_control": "Control venue lighting (future)",
+    "send_alert": "Send high-priority alert",
+    "log_event": "Log custom event for analytics"
+  }
+}

@@ -1,0 +1,73 @@
+{
+  "version": "1.0",
+  "description": "Hospitality bar safety, broken glass, spill hazard and cocktail density rules",
+  "rules": [
+    {
+      "id": "broken_glass_detected",
+      "description": "High-confidence broken glass acoustic fracture + optical scatter detected",
+      "condition": "shatter_detected == True or broken_glass_count > 0",
+      "priority": 10,
+      "cooldown_seconds": 30,
+      "actions": [
+        "send_alert:BROKEN_GLASS_ALERT",
+        "notify_staff:clean_broken_glass",
+        "log_event:broken_glass_hazard"
+      ]
+    },
+    {
+      "id": "slip_fall_incident",
+      "description": "Rapid downward pelvic acceleration and horizontal stagnation detected",
+      "condition": "fall_detected == True",
+      "priority": 10,
+      "cooldown_seconds": 30,
+      "actions": [
+        "send_alert:FALL_INCIDENT_ALERT",
+        "notify_staff:check_patron_safety",
+        "log_event:slip_fall_incident"
+      ]
+    },
+    {
+      "id": "knife_security_hazard",
+      "description": "Knife or bladed weapon visible in venue",
+      "condition": "knife_count > 0",
+      "priority": 10,
+      "cooldown_seconds": 30,
+      "actions": [
+        "send_alert:SECURITY_HAZARD_KNIFE",
+        "notify_staff:security_intervention",
+        "log_event:knife_detected"
+      ]
+    },
+    {
+      "id": "cocktail_glass_spill_risk",
+      "description": "Dense glassware concentration near edge of bar",
+      "condition": "glass_count > 8 and person_count > 25",
+      "priority": 4,
+      "cooldown_seconds": 300,
+      "actions": [
+        "notify_staff:clear_empty_glassware",
+        "log_event:glassware_congestion"
+      ]
+    },
+    {
+      "id": "abandoned_cocktail_glasses",
+      "description": "High volume of finished/empty cocktail glasses remaining unbussed",
+      "condition": "empty_glass_count > 5",
+      "priority": 2,
+      "cooldown_seconds": 600,
+      "actions": [
+        "notify_staff:bus_empty_tables",
+        "log_event:bussing_requested"
+      ]
+    }
+  ],
+  "context_variables": {
+    "shatter_detected": "Boolean indicating acoustic+visual glass break event",
+    "broken_glass_count": "Count of fragmented glass shard clusters",
+    "fall_detected": "Boolean indicating slip/fall kinematic event",
+    "knife_count": "Number of detected knives",
+    "glass_count": "Number of detected glasses and stemware",
+    "empty_glass_count": "Number of depleted beverage vessels",
+    "person_count": "Number of detected individuals"
+  }
+}

@@ -1,0 +1,53 @@
+[build-system]
+requires = ["setuptools>=68.0.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "argus-vision"
+version = "0.1.0"
+description = "Real-Time Edge Vision & Venue Spatial Intelligence Engine: Transparent Glassware, Crowd Dynamics, Hazard Alerts & Telemetry"
+authors = [{ name = "Luis Enrique", email = "luisenriquecgongora@gmail.com" }]
+readme = "README.md"
+license = { text = "MIT" }
+requires-python = ">=3.10,<3.13"
+dependencies = [
+    "numpy>=1.24.0",
+    "opencv-python>=4.8.0",
+    "ultralytics>=8.2.0",
+    "simpleeval>=0.9.13",
+    "pydantic>=2.7.0",
+    "pydantic-settings>=2.2.0",
+    "loguru>=0.7.0",
+]
+
+[project.optional-dependencies]
+audio = [
+    "pyaudio>=0.2.13",
+    "scipy>=1.11.0",
+]
+server = [
+    "fastapi>=0.111.0",
+    "uvicorn[standard]>=0.30.0",
+    "websockets>=12.0",
+]
+cloud = [
+    "boto3>=1.34.0",
+    "google-api-python-client>=2.100.0",
+    "google-auth>=2.23.0",
+]
+dev = [
+    "pytest>=8.0.0",
+    "pytest-asyncio>=0.23.0",
+    "ruff>=0.4.0",
+    "mypy>=1.10.0",
+]
+
+[project.scripts]
+argus = "argus.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]
