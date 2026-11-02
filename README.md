@@ -2,7 +2,7 @@
 
 > *"At your service. Vision, cocktail perception & venue spatial intelligence for modern spaces."*  
 > **Autonomous Edge Vision & Multimodal Venue Spatial Intelligence Engine**  
-> **Python 3.12 / YOLOv11 / MediaPipe / ONNX Runtime Edge Perception Daemon & Featherweight Client SDK**  
+> **Python 3.12 / YOLOX (ONNX Runtime) / MediaPipe Edge Perception Daemon & Featherweight Client SDK**  
 > Real-time crowd density, transparent glassware & cocktail tracking, broken glass hazard detection, and automated spatial telemetry for hospitality and commercial spaces.
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-teal.svg)](https://opensource.org/licenses/MIT)
@@ -20,7 +20,7 @@
 ```
 ┌──────────────────────────────────────────────────────────────────────────────┐
 │ 1. VIDEO & AUDIO INGEST ──> 🎥 USB / IP RTSP stream + 16kHz audio mic        │
-│ 2. EDGE INFERENCE       ──> ⚡ YOLOv11 multi-class + TransLab glass rim +    │
+│ 2. EDGE INFERENCE       ──> ⚡ YOLOX multi-class + TransLab glass rim +      │
 │                               CSRNet crowd density + 3-8kHz shatter STFT     │
 │ 3. SPATIAL REASONING    ──> 📐 Sliding-window trends, queue latency,         │
 │                               and metric homography coordinates              │

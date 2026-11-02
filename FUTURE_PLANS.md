@@ -44,7 +44,7 @@ where $\nabla M$ denotes Sobel-filtered boundary ground truth, compelling the mo
 $$\mathcal{L}_{\text{Boundary}} = 1 - \frac{2 \sum |\nabla M \cdot \nabla \hat{M}|}{\sum |\nabla M|^2 + \sum |\nabla \hat{M}|^2}$$
 
 #### 3. Concrete Implementation Plan (`src/Moza/detectors/glassware.py`)
-- Fine-tune a lightweight **YOLOv11-Seg / MobileSAM** on the **Trans10K** and **ClearPose** transparent object datasets.
+- Fine-tune a lightweight Apache-2.0 segmenter (**RTMDet-Ins / MobileSAM**; avoid AGPL YOLOv8/v11-Seg) on the **Trans10K** and **ClearPose** transparent object datasets.
 - Implement an edge post-processor that detects the elliptical opening (rim) and base of cocktail glasses using Hough Ellipse Fitting to calculate 3D vessel tilt and orientation vectors.
 
 ---

@@ -25,7 +25,7 @@ flowchart TD
     end
 
     subgraph PerceptionSuite["3. Modular Perception Suite (moza.detectors)"]
-        YOLO["PersonDetector : BaseDetector\n(YOLOv8/v11 Multi-Class & MediaPipe)"]
+        YOLO["PersonDetector : BaseDetector\n(YOLOX ONNX Multi-Class & MediaPipe)"]
         Glass["GlasswareDetector\n(Meniscus, Volume Fill-Level & Chromaticity)"]
         Shatter["ShatterDetector\n(3-8kHz Acoustic FFT + Specular Optical Glint)"]
         Privacy["FaceAnonymizer\n(Zero-PII On-Edge Gaussian Blurring)"]
@@ -159,7 +159,7 @@ moza/
 │   │   ├── camera.py               # CameraManager (USB webcams, RTSP IP cams)
 │   │   └── recorder.py             # VideoRecorder (segmented MP4s with auto-cleanup)
 │   ├── detectors/                  # Perception models and neural inference
-│   │   ├── detector.py             # PersonDetector (YOLOv8/v11 + MediaPipe Pose)
+│   │   ├── detector.py             # PersonDetector (YOLOX ONNX + MediaPipe Pose)
 │   │   ├── glassware.py            # GlasswareDetector (meniscus & cocktail fill-level)
 │   │   └── shatter.py              # ShatterDetector (3-8kHz acoustic shock + optical glint)
 │   ├── analytics/                  # Spatial telemetry & database engine
