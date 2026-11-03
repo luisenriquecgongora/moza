@@ -61,3 +61,6 @@ Thumbs.db
 # Downloaded model weights
 models/
 *.onnx
+
+# Node dependencies
+node_modules/
