@@ -7,7 +7,7 @@ import json
 import os
 from typing import List, Dict, Callable, Optional, Any
 from dataclasses import dataclass
-from datetime import datetime, timedelta
+from datetime import datetime
 
 try:
     from simpleeval import SimpleEval

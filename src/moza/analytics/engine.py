@@ -5,7 +5,6 @@ Stores detection metrics in SQLite database for analysis and decision-making.
 
 import sqlite3
 import json
-import os
 from contextlib import contextmanager
 from datetime import datetime, timedelta
 from typing import List, Dict, Optional, Any

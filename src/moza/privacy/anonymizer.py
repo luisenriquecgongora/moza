@@ -3,10 +3,8 @@ Real-time edge face blurring and zero-PII privacy anonymization.
 Ensures zero identifiable biometric data is recorded or stored.
 """
 
-from typing import Optional
 import numpy as np
 
-from ..logger import logger
 
 
 class FaceAnonymizer:

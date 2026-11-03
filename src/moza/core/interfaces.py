@@ -10,7 +10,6 @@ from abc import ABC, abstractmethod
 from typing import Optional, Dict, Any
 import numpy as np
 
-from .models import DetectionResult, MozaTelemetry
 
 
 class BaseFrameSource(ABC):
