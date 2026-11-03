@@ -41,7 +41,7 @@ def main():
         use_yolo=args.yolo,
         detect_objects=not args.no_multiclass
     )
-    glass_detector = GlasswareDetector(confidence_threshold=args.confidence)
+    glass_detector = GlasswareDetector(confidence_threshold=args.confidence)  # noqa: F841  built but not yet wired into the loop below
     shatter_detector = ShatterDetector()
     analytics = AnalyticsEngine(db_path=args.db)
 
