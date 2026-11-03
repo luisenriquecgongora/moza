@@ -1,5 +1,5 @@
 import React from 'react';
-import { Wine, Beer, AlertTriangle, TrendingUp, TrendingDown, Minus } from 'lucide-react';
+import { Wine, Beer, TrendingUp, TrendingDown, Minus } from 'lucide-react';
 import { MozaTelemetry } from '../hooks/useMozaTelemetry';
 
 interface CocktailHUDProps {

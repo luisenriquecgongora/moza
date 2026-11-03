@@ -1,5 +1,5 @@
 import React from 'react';
-import { AlertOctagon, ShieldAlert, CheckCircle2 } from 'lucide-react';
+import { AlertOctagon, CheckCircle2 } from 'lucide-react';
 import { MozaTelemetry } from '../hooks/useMozaTelemetry';
 
 interface HazardAlertBannerProps {
