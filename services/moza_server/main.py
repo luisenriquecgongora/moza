@@ -30,10 +30,22 @@ app = FastAPI(
     version="0.1.0"
 )
 
+# Browser pages allowed to call this server: the desktop app (Tauri 2 serves it from
+# http://tauri.localhost on Windows, tauri://localhost on macOS/Linux) and its Vite
+# dev server. Any other website open on this machine must not read the camera
+# telemetry or change the config. Non-browser clients send no Origin and are
+# unaffected. Add origins with MOZA_ALLOWED_ORIGINS (comma-separated).
+ALLOWED_ORIGINS = [
+    "http://tauri.localhost",
+    "tauri://localhost",
+    "http://localhost:3302",
+    "http://127.0.0.1:3302",
+] + [o.strip() for o in os.environ.get("MOZA_ALLOWED_ORIGINS", "").split(",") if o.strip()]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
+    allow_origins=ALLOWED_ORIGINS,
+    allow_credentials=False,
     allow_methods=["*"],
     allow_headers=["*"],
 )
@@ -212,6 +224,11 @@ async def get_current_metrics():
 
 @app.websocket("/ws/telemetry")
 async def websocket_telemetry(websocket: WebSocket):
+    # Browsers do not apply CORS to WebSockets, so check the Origin here.
+    origin = websocket.headers.get("origin")
+    if origin is not None and origin not in ALLOWED_ORIGINS:
+        await websocket.close(code=1008)  # policy violation
+        return
     await hub.connect(websocket)
     try:
         while True:
