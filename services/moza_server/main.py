@@ -3,7 +3,9 @@ Moza Server: Production FastAPI & WebSocket Telemetry Streaming Daemon.
 Runs edge perception in background worker and exposes real-time telemetry over WebSockets and REST.
 """
 
+import argparse
 import asyncio
+import os
 import threading
 import time
 from typing import Dict, Any, List, Optional, Union
@@ -259,8 +261,22 @@ async def stream_video():
     )
 
 
-def main():
-    uvicorn.run("services.moza_server.main:app", host="0.0.0.0", port=8100, reload=False)
+LOOPBACK_HOSTS = {"127.0.0.1", "localhost", "::1"}
+
+
+def main(argv: Optional[List[str]] = None):
+    # Loopback by default: the video stream and telemetry show people on camera.
+    # Serving other machines is opt-in (--host 0.0.0.0 or MOZA_HOST); the Docker image does so.
+    parser = argparse.ArgumentParser(description="Moza vision server")
+    parser.add_argument("--host", default=os.environ.get("MOZA_HOST", "127.0.0.1"))
+    parser.add_argument("--port", type=int, default=int(os.environ.get("MOZA_PORT", "8100")))
+    args = parser.parse_args(argv)
+    if args.host not in LOOPBACK_HOSTS:
+        logger.warning(
+            f"Serving on {args.host}:{args.port}: the live video stream and telemetry "
+            "are reachable from other machines on this network."
+        )
+    uvicorn.run("services.moza_server.main:app", host=args.host, port=args.port, reload=False)
 
 
 if __name__ == "__main__":
