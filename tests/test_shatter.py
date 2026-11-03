@@ -3,7 +3,6 @@ Unit tests for ShatterDetector
 """
 
 import numpy as np
-import pytest
 from moza.detectors.shatter import ShatterDetector
 
 
