@@ -3,11 +3,10 @@ Transparent Glassware, Stemware & Cocktail Perception Engine.
 Detects transparent vessels, extracts liquid meniscus, and estimates fill level.
 """
 
-from typing import List, Optional, Tuple, Dict, Any
+from typing import Tuple
 import numpy as np
 
 from ..core.models import GlassType, FillState, GlassDetection
-from ..logger import logger
 
 
 class GlasswareDetector:

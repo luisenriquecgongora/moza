@@ -9,7 +9,7 @@ and runs here through ONNX Runtime (MIT). No AGPL code or weights are used.
 import os
 import urllib.request
 from pathlib import Path
-from typing import Dict, List, Optional, Tuple, Any
+from typing import Dict, List, Tuple, Any
 
 import numpy as np
 

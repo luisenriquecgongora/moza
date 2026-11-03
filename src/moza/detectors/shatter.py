@@ -3,7 +3,7 @@ Multimodal Broken Glass & Shatter Detection Engine.
 Fuses high-frequency acoustic shockwave transients with optical specular shard scatter.
 """
 
-from typing import Optional, Tuple
+from typing import Optional
 import numpy as np
 
 from ..core.models import ShatterEvent
