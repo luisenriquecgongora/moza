@@ -2,7 +2,7 @@
 Unit tests for MozaClient data parsing
 """
 
-from moza_client.client import MozaTelemetry, MozaClient
+from moza_client.client import MozaTelemetry
 
 
 def test_telemetry_instantiation():

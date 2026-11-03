@@ -4,7 +4,6 @@ Unit tests for Moza AnalyticsEngine
 
 import os
 import tempfile
-import pytest
 from moza.analytics.engine import AnalyticsEngine
 
 

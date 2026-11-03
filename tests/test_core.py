@@ -3,14 +3,12 @@ Unit tests for Moza Core interfaces, models, and SOLID contracts
 """
 
 import numpy as np
-import pytest
 from moza.core.models import (
     BoundingBox,
     ObjectCategory,
-    DetectionResult,
     MozaTelemetry,
 )
-from moza.core.interfaces import BaseDetector, BaseFrameSource
+from moza.core.interfaces import BaseDetector
 
 
 class DummyMockDetector(BaseDetector):

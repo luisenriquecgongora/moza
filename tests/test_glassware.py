@@ -3,8 +3,7 @@ Unit tests for GlasswareDetector and fill-level logic
 """
 
 import numpy as np
-import pytest
-from moza.detectors.glassware import GlasswareDetector, FillState, GlassType
+from moza.detectors.glassware import GlasswareDetector, FillState
 
 
 def test_glassware_detector_synthetic_roi():

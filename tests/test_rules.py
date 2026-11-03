@@ -3,7 +3,6 @@ Unit tests for Argus DecisionEngine
 """
 
 from pathlib import Path
-import pytest
 from moza.rules.decision_engine import DecisionEngine
 
 
