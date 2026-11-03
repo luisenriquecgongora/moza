@@ -3,7 +3,6 @@ Segmented Video Recorder with retention management.
 Saves video segments organized by timestamp with automatic cleanup of old recordings.
 """
 
-import os
 import shutil
 import threading
 from datetime import datetime, timedelta
@@ -65,7 +64,6 @@ class VideoRecorder:
         if not self.is_recording:
             return
 
-        import cv2
 
         with self._lock:
             now = datetime.now()

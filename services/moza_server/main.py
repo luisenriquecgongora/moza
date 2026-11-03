@@ -4,7 +4,6 @@ Runs edge perception in background worker and exposes real-time telemetry over W
 """
 
 import asyncio
-import json
 import threading
 import time
 from typing import Dict, Any, List, Optional, Union

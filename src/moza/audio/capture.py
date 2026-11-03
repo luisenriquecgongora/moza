@@ -4,7 +4,7 @@ Audio capture module for ambient sound level metering and fracture acoustic anal
 
 import threading
 import queue
-from typing import Optional, Callable
+from typing import Optional
 import numpy as np
 
 from ..logger import logger
