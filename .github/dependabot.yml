@@ -1,0 +1,39 @@
+# Weekly dependency updates. Minor and patch bumps are grouped into one PR per
+# ecosystem; major bumps get their own PR so breaking changes stay reviewable.
+version: 2
+
+updates:
+  - package-ecosystem: pip
+    directory: /
+    schedule: { interval: weekly, day: monday }
+    open-pull-requests-limit: 5
+    commit-message: { prefix: build, include: scope }
+    groups:
+      python:
+        update-types: [minor, patch]
+
+  - package-ecosystem: npm
+    directory: /apps/desktop
+    schedule: { interval: weekly, day: monday }
+    open-pull-requests-limit: 5
+    commit-message: { prefix: build, include: scope }
+    groups:
+      desktop:
+        update-types: [minor, patch]
+
+  - package-ecosystem: cargo
+    directory: /apps/desktop/src-tauri
+    schedule: { interval: weekly, day: monday }
+    open-pull-requests-limit: 5
+    commit-message: { prefix: build, include: scope }
+    groups:
+      tauri:
+        update-types: [minor, patch]
+
+  - package-ecosystem: github-actions
+    directory: /
+    schedule: { interval: monthly }
+    commit-message: { prefix: ci }
+    groups:
+      actions:
+        patterns: ["*"]
