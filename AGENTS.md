@@ -61,7 +61,7 @@ All commits must follow:
 - New implementations should subclass the interfaces in `core/interfaces.py`; `GlasswareDetector` and `ShatterDetector` do not yet.
 - The YOLOX model downloads on first use into `models/` (gitignored); override with `MOZA_MODEL` / `MOZA_MODEL_DIR`. Tests must not depend on it.
 - The server URL `127.0.0.1:8100` is hard-coded in several desktop files (`grep -rn 8100 apps/desktop/src`); change them together.
-- The server binds `0.0.0.0`, so the video stream is reachable from the local network.
+- The server binds `127.0.0.1` by default because the video stream shows people on camera. Network access is opt-in: `--host 0.0.0.0` or `MOZA_HOST`. The Docker image binds `0.0.0.0` on purpose (container port mapping needs it).
 - Ruff rules are pinned in `pyproject.toml`; there is no mypy gate yet.
 
 ### 9. Never

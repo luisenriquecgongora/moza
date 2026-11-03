@@ -107,6 +107,9 @@ python -m moza.cli --source 0 --resolution 1280x720 --confidence 0.35
 ```bash
 # Start edge daemon on port 8100
 python -m services.moza_server.main --port 8100
+
+# Listens on 127.0.0.1 only. To serve other machines (e.g. a remote robot_host):
+python -m services.moza_server.main --host 0.0.0.0   # or set MOZA_HOST=0.0.0.0
 ```
 
 ### 4. Featherweight Client Usage (e.g. inside `robot_host`)
