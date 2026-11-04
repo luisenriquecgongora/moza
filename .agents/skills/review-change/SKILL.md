@@ -21,6 +21,7 @@ for a check the change touches. Quote failures exactly.
 
 ## 3. Correctness
 
+- Does a change to the parts or the frame flow update `docs/ARCHITECTURE.md` and its diagrams (`AGENTS.md`, section 11)?
 - Does every behavior change come with a test in `tests/` that fails without it? Tests use synthetic numpy frames, never a camera or a downloaded model.
 - Optional dependencies (ONNX model, scipy, MediaPipe, pyaudio) missing: the code degrades and logs, it does not crash.
 - The CLI loop (`src/moza/cli.py`) and the server loop (`background_vision_worker`) change together.
