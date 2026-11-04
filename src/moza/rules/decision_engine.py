@@ -3,6 +3,7 @@ Rule-based decision engine with priority queue and cooldown.
 Evaluates conditions safely and dispatches actions without spam.
 """
 
+import ast
 import json
 import os
 from typing import List, Dict, Callable, Optional, Any
@@ -12,6 +13,20 @@ from datetime import datetime
 from simpleeval import SimpleEval
 
 from ..logger import logger
+
+# Names the server puts in the context it evaluates rules against
+# (background_vision_worker in services/moza_server/main.py). Keep the two in sync.
+CONTEXT_KEYS = frozenset({
+    "person_count", "bottle_count", "wine_glass_count", "knife_count",
+    "shatter_detected", "broken_glass_count", "zone_id", "trend",
+})
+_LITERAL_NAMES = {"True", "False", "None"}
+
+
+def condition_names(condition: str) -> set:
+    """Variable names a rule condition reads."""
+    tree = ast.parse(condition, mode="eval")
+    return {n.id for n in ast.walk(tree) if isinstance(n, ast.Name)} - _LITERAL_NAMES
 
 
 @dataclass
@@ -30,8 +45,10 @@ class DecisionEngine:
     Evaluates venue conditions against JSON rulesets.
     """
 
-    def __init__(self, rules_config_paths: Optional[List[str]] = None):
+    def __init__(self, rules_config_paths: Optional[List[str]] = None, known_names=CONTEXT_KEYS):
         self.rules_config_paths = rules_config_paths or ["configs/rules/crowd_density.json", "configs/rules/bar_safety.json"]
+        self.known_names = frozenset(known_names)
+        self.skipped_rules: Dict[str, str] = {}
         self.rules: List[Rule] = []
         self.action_handlers: Dict[str, Callable] = {}
         self.last_triggered: Dict[str, datetime] = {}
@@ -57,6 +74,11 @@ class DecisionEngine:
             with open(path, "r", encoding="utf-8") as f:
                 data = json.load(f)
             for r in data.get("rules", []):
+                reason = self._skip_reason(r)
+                if reason:
+                    self.skipped_rules[r["id"]] = reason
+                    logger.warning(f"Rule [{r['id']}] skipped: {reason}")
+                    continue
                 self.rules.append(Rule(
                     id=r["id"],
                     condition=r["condition"],
@@ -66,6 +88,19 @@ class DecisionEngine:
                 ))
         except Exception as e:
             logger.error(f"Error loading rule file {path}: {e}")
+
+    def _skip_reason(self, rule: Dict[str, Any]) -> Optional[str]:
+        """Why a rule cannot run (disabled, unparsable, or reads names the context lacks), else None."""
+        if rule.get("enabled", True) is False:
+            return "disabled"
+        try:
+            names = condition_names(rule["condition"])
+        except SyntaxError as e:
+            return f"invalid condition: {e.msg}"
+        unknown = sorted(names - self.known_names)
+        if unknown:
+            return f"uses values the server does not provide: {', '.join(unknown)}"
+        return None
 
     def register_action_handler(self, action_type: str, handler: Callable) -> None:
         """Register callback for action prefix (e.g., 'notify_staff', 'send_alert')."""
