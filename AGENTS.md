@@ -63,6 +63,7 @@ All commits must follow:
 - The YOLOX model downloads on first use into `models/` (gitignored); override with `MOZA_MODEL` / `MOZA_MODEL_DIR`. Tests must not depend on it.
 - The server URL `127.0.0.1:8100` is hard-coded in several desktop files (`grep -rn 8100 apps/desktop/src`); change them together.
 - The server binds `127.0.0.1` by default because the video stream shows people on camera. Network access is opt-in: `--host 0.0.0.0` or `MOZA_HOST`. The Docker image binds `0.0.0.0` on purpose (container port mapping needs it). Browser access is limited to the desktop app origins in `ALLOWED_ORIGINS` (`services/moza_server/main.py`), for HTTP and the WebSocket; add a web dashboard with `MOZA_ALLOWED_ORIGINS`.
+- Rules only see the values in `CONTEXT_KEYS` (`src/moza/rules/decision_engine.py`), which the server context must match; rules using anything else are skipped at load. Triggered `send_alert` / `notify_staff` / `log_event` actions go to `ActionExecutor`, which posts to `MOZA_WEBHOOK_URL` when set.
 - Ruff rules are pinned in `pyproject.toml`; there is no mypy gate yet.
 
 ### 9. Never
