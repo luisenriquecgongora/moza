@@ -19,6 +19,7 @@ from ..logger import logger
 CONTEXT_KEYS = frozenset({
     "person_count", "bottle_count", "wine_glass_count", "knife_count",
     "shatter_detected", "broken_glass_count", "zone_id", "trend",
+    "hour", "total_beverages", "glass_count",
 })
 _LITERAL_NAMES = {"True", "False", "None"}
 

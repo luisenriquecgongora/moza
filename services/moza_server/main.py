@@ -172,7 +172,10 @@ def background_vision_worker():
                     "shatter_detected": shatter_event.detected,
                     "broken_glass_count": 1 if shatter_event.detected else 0,
                     "zone_id": "main",
-                    "trend": metrics["trend"]
+                    "trend": metrics["trend"],
+                    "hour": time.localtime(now).tm_hour,
+                    "total_beverages": metrics["total_beverages"],
+                    "glass_count": counts.get("wine glass", 0),
                 }
                 decision_engine.evaluate(context)
 
