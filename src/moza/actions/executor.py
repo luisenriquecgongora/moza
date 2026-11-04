@@ -6,6 +6,7 @@ Handles webhooks, staff alerts, and third-party system integrations.
 from typing import Dict, Any, Optional
 from datetime import datetime
 import json
+import threading
 import urllib.request
 
 from ..core.interfaces import BaseActionChannel
@@ -59,10 +60,15 @@ class ActionExecutor(BaseActionChannel):
         logger.info(f"📝 Telemetry Event: {params} in zone {context.get('zone_id')}")
 
     def _send_webhook(self, payload: Dict[str, Any]) -> None:
-        """Post payload to webhook URL if configured."""
+        """Post payload to webhook URL if configured, off the caller's thread (the vision loop)."""
         if not self.webhook_url:
             return
+        if not self.webhook_url.startswith(("http://", "https://")):
+            logger.error("Webhook URL must start with http:// or https://; alert not sent")
+            return
+        threading.Thread(target=self._post_webhook, args=(payload,), daemon=True).start()
 
+    def _post_webhook(self, payload: Dict[str, Any]) -> None:
         try:
             req = urllib.request.Request(
                 self.webhook_url,
