@@ -16,6 +16,8 @@
     },
     {
       "id": "slip_fall_incident",
+      "enabled": false,
+      "disabled_reason": "No fall detector exists yet; enable once fall_detected is provided",
       "description": "Rapid downward pelvic acceleration and horizontal stagnation detected",
       "condition": "fall_detected == True",
       "priority": 10,
@@ -51,6 +53,8 @@
     },
     {
       "id": "abandoned_cocktail_glasses",
+      "enabled": false,
+      "disabled_reason": "Glass fill level is not detected yet; enable once empty_glass_count is provided",
       "description": "High volume of finished/empty cocktail glasses remaining unbussed",
       "condition": "empty_glass_count > 5",
       "priority": 2,
