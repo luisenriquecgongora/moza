@@ -21,6 +21,7 @@ from moza.detectors.detector import PersonDetector
 from moza.detectors.shatter import ShatterDetector
 from moza.analytics.engine import AnalyticsEngine
 from moza.rules.decision_engine import DecisionEngine
+from moza.actions.executor import ActionExecutor
 from moza.privacy.anonymizer import FaceAnonymizer
 from moza.logger import logger
 
@@ -108,6 +109,17 @@ class ConfigPayload(BaseModel):
     source: Optional[Union[int, str]] = None
 
 
+ACTION_TYPES = ("send_alert", "notify_staff", "log_event")
+
+
+def register_action_handlers(decision_engine: DecisionEngine, executor: ActionExecutor) -> None:
+    """Route rule actions to the executor (log, plus MOZA_WEBHOOK_URL when set)."""
+    for action_type in ACTION_TYPES:
+        decision_engine.register_action_handler(
+            action_type, lambda params, context, t=action_type: executor.dispatch(t, params, context)
+        )
+
+
 def background_vision_worker():
     """Continuous edge detection loop running in background thread."""
     global latest_telemetry, latest_jpeg_frame
@@ -119,6 +131,7 @@ def background_vision_worker():
         anonymizer = FaceAnonymizer()
         analytics = AnalyticsEngine(db_path="data/metrics.db")
         decision_engine = DecisionEngine()
+        register_action_handlers(decision_engine, ActionExecutor(webhook_url=os.environ.get("MOZA_WEBHOOK_URL")))
 
         camera.start()
         logger.info("Moza background vision worker running...")
