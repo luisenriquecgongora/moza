@@ -9,17 +9,7 @@ from typing import List, Dict, Callable, Optional, Any
 from dataclasses import dataclass
 from datetime import datetime
 
-try:
-    from simpleeval import SimpleEval
-except ImportError:
-    class SimpleEval:  # type: ignore
-        """Fallback safe evaluator when simpleeval is not installed."""
-        def __init__(self):
-            self.names: Dict[str, Any] = {}
-
-        def eval(self, expr: str) -> Any:
-            safe_globals = {"__builtins__": None, "True": True, "False": False}
-            return eval(expr, safe_globals, self.names)
+from simpleeval import SimpleEval
 
 from ..logger import logger
 
