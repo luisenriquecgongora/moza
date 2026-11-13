@@ -1,6 +1,6 @@
 [package]
 name = "moza"
-version = "0.1.0"
+version = "0.2.0"
 description = "Moza Studio - Autonomous Edge Vision & 3D Spatial Intelligence"
 authors = ["Luis Enrique <luisenriquecgongora@gmail.com>"]
 edition = "2021"
