@@ -28,6 +28,7 @@ VENV = ROOT / ".venv"
 CHECKS: list[tuple[str, str, str, list[str]]] = [
     ("python", "ruff", ".", ["{ruff}", "check", "src", "services", "clients", "tests"]),
     ("python", "tests", ".", ["{py}", "-m", "pytest", "-q"]),
+    ("python", "release script tests", ".", ["{py}", "-m", "unittest", "scripts/test_prune_r2_releases.py", "scripts/test_publish_release_to_r2.py"]),
     ("desktop", "desktop typecheck", "apps/desktop", ["{yarn}", "tsc", "--noEmit"]),
 ]
 # Linter run on each file an agent edits, by file extension ("{file}" is the file);
