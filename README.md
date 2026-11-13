@@ -147,6 +147,12 @@ Read our comprehensive 10 graduate-level research initiatives in [**FUTURE_PLANS
 
 ---
 
+## 📦 Desktop Downloads
+
+Moza Studio installers for Windows, macOS and Linux are on [GitHub Releases](https://github.com/luisenriquecgongora/moza/releases) and at `https://pub-fb9de4da4f48439ebb34b3795d05ab11.r2.dev/moza/latest/` (`version.json` lists the files). How releases are built and published: [docs/RELEASES.md](docs/RELEASES.md).
+
+---
+
 ## 📄 License
 Moza is **source-available** under the [PolyForm Shield License 1.0.0](LICENSE). It is not open source.
 
