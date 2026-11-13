@@ -1,0 +1,101 @@
+name: 'Release Moza Desktop'
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    permissions:
+      contents: write
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - platform: 'windows-latest'
+            args: ''
+          - platform: 'macos-latest'
+            args: '--target universal-apple-darwin'
+          - platform: 'ubuntu-22.04'
+            args: ''
+
+    runs-on: ${{ matrix.platform }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install dependencies (Ubuntu only)
+        if: matrix.platform == 'ubuntu-22.04'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libwebkit2gtk-4.1-dev build-essential curl wget file libssl-dev libgtk-3-dev libayatana-appindicator3-dev librsvg2-dev
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'yarn'
+          cache-dependency-path: apps/desktop/yarn.lock
+
+      - name: Install Rust stable
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.platform == 'macos-latest' && 'aarch64-apple-darwin,x86_64-apple-darwin' || '' }}
+
+      - name: Install JavaScript dependencies
+        working-directory: apps/desktop
+        run: yarn install --frozen-lockfile
+
+      - name: Build Tauri Desktop Binary and Create Release
+        uses: tauri-apps/tauri-action@v0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          projectPath: './apps/desktop'
+          tagName: ${{ github.ref_name }}
+          releaseName: 'Moza v__VERSION__'
+          releaseBody: 'See the assets below to download Moza Desktop for Windows, macOS, and Linux.'
+          releaseDraft: false
+          prerelease: false
+          args: ${{ matrix.args }}
+
+  # Copy one main installer per platform from the GitHub Release to the shared
+  # luisenrique-releases R2 bucket (moza/vX.Y.Z and moza/latest), keeping the newest 3.
+  publish-r2:
+    name: Publish to Cloudflare R2
+    needs: release
+    if: startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install publish dependencies
+        run: pip install boto3 packaging
+
+      - name: Test release scripts
+        run: python -m unittest scripts/test_prune_r2_releases.py scripts/test_publish_release_to_r2.py
+
+      - name: Download the release installers
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release download "${{ github.ref_name }}" --repo "${{ github.repository }}" --dir release-assets --pattern '*_x64-setup.exe' --pattern '*_universal.dmg' --pattern '*_amd64.AppImage'
+
+      - name: Publish to R2 (keeps the newest 3 releases)
+        env:
+          R2_ACCOUNT_ID: ${{ secrets.R2_ACCOUNT_ID }}
+          R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+          R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+          R2_BUCKET_NAME: ${{ secrets.R2_BUCKET_NAME || 'luisenrique-releases' }}
+          R2_CUSTOM_DOMAIN: ${{ secrets.R2_CUSTOM_DOMAIN || 'https://pub-fb9de4da4f48439ebb34b3795d05ab11.r2.dev' }}
+        run: python scripts/publish_release_to_r2.py --version "${{ github.ref_name }}" --assets-dir release-assets
