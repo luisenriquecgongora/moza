@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.3.0](https://github.com/luisenriquecgongora/moza/compare/v0.2.0...v0.3.0) (2026-11-23)
+
+
+### Features
+
+* **scripts:** add visual diff, artifact opener, and cowork timeline ([051b858](https://github.com/luisenriquecgongora/moza/commit/051b858ec8a4bf35967c459d267c07a655e51697))
+* **scripts:** sync cowork vision hud and visual release digest v1.4.5 ([8f791e7](https://github.com/luisenriquecgongora/moza/commit/8f791e7065800ee014d9c3bb1feca2b20b6f4d4c))
+
 ## [0.2.0](https://github.com/luisenriquecgongora/moza/compare/v0.1.0...v0.2.0) (2026-11-13)
 
 
